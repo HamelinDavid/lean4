@@ -21,7 +21,7 @@
   #  inputs.lean4-mode.follows = "lean4-mode";
   #};
 
-  outputs = { self, nixpkgs, flake-utils, nix, lean4-mode, ... }@inputs: flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, flake-utils, nix, lean4-mode, lake, ... }@inputs: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs {
         inherit system;
