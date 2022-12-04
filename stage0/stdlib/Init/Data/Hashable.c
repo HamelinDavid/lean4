@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Init.Data.Hashable
-// Imports: Init.Data.UInt Init.Data.String
+// Imports: Init.Data.UInt.Basic Init.Data.String
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -13,68 +13,68 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-size_t lean_usize_add(size_t, size_t);
 uint64_t lean_uint8_to_uint64(uint8_t);
-uint8_t lean_usize_dec_eq(size_t, size_t);
-lean_object* lean_array_uget(lean_object*, size_t);
-LEAN_EXPORT uint64_t l_instHashableProd___rarg(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT uint64_t l_instHashableUSize(size_t);
-LEAN_EXPORT lean_object* l_instHashableList(lean_object*);
 LEAN_EXPORT lean_object* l_instHashableUSize___boxed(lean_object*);
-LEAN_EXPORT lean_object* l_List_foldl___at_instHashableList___spec__1___rarg___boxed(lean_object*, lean_object*, lean_object*);
-lean_object* lean_array_get_size(lean_object*);
-uint64_t lean_uint16_to_uint64(uint16_t);
-LEAN_EXPORT lean_object* l_instHashable___boxed(lean_object*, lean_object*);
-LEAN_EXPORT uint64_t l_instHashableBool(uint8_t);
-LEAN_EXPORT lean_object* l_instHashableOption(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableInt(lean_object*);
-lean_object* lean_nat_add(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashablePos___boxed(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableFin___boxed(lean_object*);
-LEAN_EXPORT uint64_t l_instHashablePos(lean_object*);
-LEAN_EXPORT lean_object* l_List_foldl___at_instHashableList___spec__1(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableUInt64___boxed(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableProd(lean_object*, lean_object*);
-lean_object* lean_nat_sub(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashableUInt16___boxed(lean_object*);
-LEAN_EXPORT lean_object* l_Array_foldlMUnsafe_fold___at_instHashableArray___spec__1___rarg___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT uint64_t l_instHashableUInt16(uint16_t);
 uint64_t lean_uint64_of_nat(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableArray___rarg(lean_object*, lean_object*);
-LEAN_EXPORT uint64_t l_instHashableUInt64(uint64_t);
-LEAN_EXPORT lean_object* l_instHashableList___rarg___boxed(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashableProd(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_Array_foldlMUnsafe_fold___at_instHashableArray___spec__1(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableProd___rarg___boxed(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashableOption___rarg___boxed(lean_object*, lean_object*);
+LEAN_EXPORT uint64_t l_instHashableUInt16(uint16_t);
+LEAN_EXPORT uint64_t l_instHashableUInt32(uint32_t);
+LEAN_EXPORT uint64_t l_instHashableOption___rarg(lean_object*, lean_object*);
+lean_object* lean_nat_abs(lean_object*);
+uint64_t lean_uint16_to_uint64(uint16_t);
+LEAN_EXPORT uint64_t l_instHashable(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashableOption(lean_object*);
 LEAN_EXPORT lean_object* l_instHashableUInt32___boxed(lean_object*);
 LEAN_EXPORT lean_object* l_instHashableFin(lean_object*);
-size_t lean_usize_of_nat(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableNat(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableFin___rarg___boxed(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableList___rarg(lean_object*, lean_object*);
 LEAN_EXPORT uint64_t l_Array_foldlMUnsafe_fold___at_instHashableArray___spec__1___rarg(lean_object*, lean_object*, size_t, size_t, uint64_t);
-LEAN_EXPORT uint64_t l_instHashableFin___rarg(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableOption___rarg___boxed(lean_object*, lean_object*);
-uint8_t lean_nat_dec_le(lean_object*, lean_object*);
-uint64_t lean_usize_to_uint64(size_t);
-uint8_t lean_int_dec_lt(lean_object*, lean_object*);
-lean_object* lean_nat_mul(lean_object*, lean_object*);
-lean_object* lean_nat_abs(lean_object*);
-uint64_t lean_uint32_to_uint64(uint32_t);
-LEAN_EXPORT lean_object* l_instHashableArray(lean_object*);
-LEAN_EXPORT lean_object* l_instHashableProd___rarg___boxed(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashableNat___boxed(lean_object*);
-uint64_t lean_uint64_mix_hash(uint64_t, uint64_t);
-LEAN_EXPORT uint64_t l_instHashable(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_Array_foldlMUnsafe_fold___at_instHashableArray___spec__1(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableOption___rarg(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashableArray___rarg___boxed(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashableBool___boxed(lean_object*);
-LEAN_EXPORT uint64_t l_instHashableUInt32(uint32_t);
 LEAN_EXPORT uint64_t l_List_foldl___at_instHashableList___spec__1___rarg(lean_object*, uint64_t, lean_object*);
+lean_object* lean_nat_sub(lean_object*, lean_object*);
+LEAN_EXPORT uint64_t l_instHashableBool(uint8_t);
+LEAN_EXPORT uint64_t l_instHashableNat(lean_object*);
 static lean_object* l_instHashableInt___closed__1;
-LEAN_EXPORT lean_object* l_instHashableUInt8___boxed(lean_object*);
+LEAN_EXPORT uint64_t l_instHashableUInt64(uint64_t);
+LEAN_EXPORT lean_object* l_instHashable___boxed(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashablePos___boxed(lean_object*);
+uint8_t lean_usize_dec_eq(size_t, size_t);
+LEAN_EXPORT uint64_t l_instHashableFin___rarg(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableList___rarg___boxed(lean_object*, lean_object*);
+LEAN_EXPORT uint64_t l_instHashablePos(lean_object*);
+LEAN_EXPORT uint64_t l_instHashableInt(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableNat___boxed(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableFin___rarg___boxed(lean_object*);
+LEAN_EXPORT uint64_t l_instHashableArray___rarg(lean_object*, lean_object*);
+LEAN_EXPORT uint64_t l_instHashableUSize(size_t);
+LEAN_EXPORT lean_object* l_List_foldl___at_instHashableList___spec__1(lean_object*);
+uint8_t lean_nat_dec_le(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_Array_foldlMUnsafe_fold___at_instHashableArray___spec__1___rarg___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashableUInt64___boxed(lean_object*);
+uint8_t lean_int_dec_lt(lean_object*, lean_object*);
+uint64_t lean_uint32_to_uint64(uint32_t);
+LEAN_EXPORT lean_object* l_instHashableInt___boxed(lean_object*);
 LEAN_EXPORT uint64_t l_instHashableUInt8(uint8_t);
+lean_object* lean_nat_add(lean_object*, lean_object*);
+uint64_t lean_usize_to_uint64(size_t);
+LEAN_EXPORT lean_object* l_List_foldl___at_instHashableList___spec__1___rarg___boxed(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_instHashableArray___rarg___boxed(lean_object*, lean_object*);
+lean_object* lean_array_get_size(lean_object*);
+lean_object* lean_nat_mul(lean_object*, lean_object*);
+size_t lean_usize_of_nat(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableUInt8___boxed(lean_object*);
+size_t lean_usize_add(size_t, size_t);
+uint64_t lean_uint64_mix_hash(uint64_t, uint64_t);
+LEAN_EXPORT lean_object* l_instHashableArray(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableUInt16___boxed(lean_object*);
+lean_object* lean_array_uget(lean_object*, size_t);
+LEAN_EXPORT lean_object* l_instHashableList(lean_object*);
+LEAN_EXPORT uint64_t l_instHashableProd___rarg(lean_object*, lean_object*, lean_object*);
 lean_object* lean_nat_to_int(lean_object*);
 uint8_t lean_nat_dec_lt(lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_instHashableInt___boxed(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableFin___boxed(lean_object*);
+LEAN_EXPORT lean_object* l_instHashableBool___boxed(lean_object*);
+LEAN_EXPORT uint64_t l_instHashableList___rarg(lean_object*, lean_object*);
 LEAN_EXPORT uint64_t l_instHashableNat(lean_object* x_1) {
 _start:
 {
@@ -593,14 +593,14 @@ x_4 = lean_box_uint64(x_3);
 return x_4;
 }
 }
-lean_object* initialize_Init_Data_UInt(uint8_t builtin, lean_object*);
+lean_object* initialize_Init_Data_UInt_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_Init_Data_String(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_Init_Data_Hashable(uint8_t builtin, lean_object* w) {
 lean_object * res;
 if (_G_initialized) return lean_io_result_mk_ok(lean_box(0));
 _G_initialized = true;
-res = initialize_Init_Data_UInt(builtin, lean_io_mk_world());
+res = initialize_Init_Data_UInt_Basic(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Init_Data_String(builtin, lean_io_mk_world());

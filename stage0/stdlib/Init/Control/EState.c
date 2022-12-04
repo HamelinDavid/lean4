@@ -13,26 +13,26 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-static lean_object* l_EStateM_instReprResult___rarg___closed__4;
-LEAN_EXPORT lean_object* l_EStateM_fromStateM___rarg(lean_object*, lean_object*);
-lean_object* lean_string_append(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_EStateM_orElse_x27___rarg(lean_object*, lean_object*, lean_object*, uint8_t, lean_object*);
-LEAN_EXPORT lean_object* l_EStateM_instToStringResult___rarg(lean_object*, lean_object*, lean_object*);
-static lean_object* l_EStateM_instReprResult___rarg___closed__3;
-LEAN_EXPORT lean_object* l_EStateM_orElse_x27___rarg___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_EStateM_instToStringResult(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_EStateM_instMonadFinallyEStateM(lean_object*, lean_object*, lean_object*, lean_object*);
-static lean_object* l_EStateM_instToStringResult___rarg___closed__1;
-LEAN_EXPORT lean_object* l_EStateM_instReprResult(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_EStateM_fromStateM(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_EStateM_instReprResult___rarg(lean_object*, lean_object*, lean_object*, lean_object*);
-static lean_object* l_EStateM_instReprResult___rarg___closed__2;
-LEAN_EXPORT lean_object* l_EStateM_instMonadFinallyEStateM___rarg(lean_object*, lean_object*, lean_object*);
-static lean_object* l_EStateM_instToStringResult___rarg___closed__2;
 LEAN_EXPORT lean_object* l_EStateM_instReprResult___rarg___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
-static lean_object* l_EStateM_instReprResult___rarg___closed__1;
-LEAN_EXPORT lean_object* l_EStateM_orElse_x27(lean_object*, lean_object*, lean_object*, lean_object*);
 lean_object* l_Repr_addAppParen(lean_object*, lean_object*);
+static lean_object* l_EStateM_instReprResult___rarg___closed__4;
+LEAN_EXPORT lean_object* l_EStateM_instReprResult(lean_object*, lean_object*, lean_object*);
+static lean_object* l_EStateM_instToStringResult___rarg___closed__2;
+static lean_object* l_EStateM_instReprResult___rarg___closed__3;
+static lean_object* l_EStateM_instReprResult___rarg___closed__2;
+LEAN_EXPORT lean_object* l_EStateM_orElse_x27(lean_object*, lean_object*, lean_object*, lean_object*);
+static lean_object* l_EStateM_instReprResult___rarg___closed__1;
+LEAN_EXPORT lean_object* l_EStateM_fromStateM___rarg(lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_EStateM_fromStateM(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_EStateM_orElse_x27___rarg___boxed(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
+lean_object* lean_string_append(lean_object*, lean_object*);
+static lean_object* l_EStateM_instToStringResult___rarg___closed__1;
+LEAN_EXPORT lean_object* l_EStateM_instMonadFinallyEStateM___rarg(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_EStateM_instToStringResult(lean_object*, lean_object*, lean_object*);
+LEAN_EXPORT lean_object* l_EStateM_instToStringResult___rarg(lean_object*, lean_object*, lean_object*);
 static lean_object* _init_l_EStateM_instToStringResult___rarg___closed__1() {
 _start:
 {
@@ -101,7 +101,7 @@ _start:
 {
 lean_object* x_1; lean_object* x_2; 
 x_1 = l_EStateM_instReprResult___rarg___closed__1;
-x_2 = lean_alloc_ctor(2, 1, 0);
+x_2 = lean_alloc_ctor(3, 1, 0);
 lean_ctor_set(x_2, 0, x_1);
 return x_2;
 }
@@ -119,7 +119,7 @@ _start:
 {
 lean_object* x_1; lean_object* x_2; 
 x_1 = l_EStateM_instReprResult___rarg___closed__3;
-x_2 = lean_alloc_ctor(2, 1, 0);
+x_2 = lean_alloc_ctor(3, 1, 0);
 lean_ctor_set(x_2, 0, x_1);
 return x_2;
 }
@@ -137,7 +137,7 @@ lean_dec(x_3);
 x_6 = lean_unsigned_to_nat(1024u);
 x_7 = lean_apply_2(x_2, x_5, x_6);
 x_8 = l_EStateM_instReprResult___rarg___closed__2;
-x_9 = lean_alloc_ctor(4, 2, 0);
+x_9 = lean_alloc_ctor(5, 2, 0);
 lean_ctor_set(x_9, 0, x_8);
 lean_ctor_set(x_9, 1, x_7);
 x_10 = l_Repr_addAppParen(x_9, x_4);
@@ -153,7 +153,7 @@ lean_dec(x_3);
 x_12 = lean_unsigned_to_nat(1024u);
 x_13 = lean_apply_2(x_1, x_11, x_12);
 x_14 = l_EStateM_instReprResult___rarg___closed__4;
-x_15 = lean_alloc_ctor(4, 2, 0);
+x_15 = lean_alloc_ctor(5, 2, 0);
 lean_ctor_set(x_15, 0, x_14);
 lean_ctor_set(x_15, 1, x_13);
 x_16 = l_Repr_addAppParen(x_15, x_4);

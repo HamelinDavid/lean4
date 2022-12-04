@@ -166,17 +166,31 @@ private def addInstMVar (mvarId : MVarId) : M Unit :=
 
 /--
   Try to synthesize metavariables are `instMVars` using type class resolution.
+  The ones that cannot be synthesized yet stay in the `instMVars` list.
+  Remark: we use this method
+    - before trying to apply coercions to function,
+    - before unifying the expected type.
+-/
+def trySynthesizeAppInstMVars : M Unit := do
+  let instMVars ← (← get).instMVars.filterM fun instMVar => do
+    unless (← instantiateMVars (← inferType (.mvar instMVar))).isMVar do try
+      if (← synthesizeInstMVarCore instMVar) then
+        return false
+      catch _ => pure ()
+    return true
+  modify ({ · with instMVars })
+
+/--
+  Try to synthesize metavariables are `instMVars` using type class resolution.
   The ones that cannot be synthesized yet are registered.
-  Remark: we use this method before trying to apply coercions to function. -/
+-/
 def synthesizeAppInstMVars : M Unit := do
-  let s ← get
-  let instMVars := s.instMVars
-  modify fun s => { s with instMVars := #[] }
-  Term.synthesizeAppInstMVars instMVars s.f
+  Term.synthesizeAppInstMVars (← get).instMVars (← get).f
+  modify ({ · with instMVars := #[] })
 
 /-- fType may become a forallE after we synthesize pending metavariables. -/
 private def synthesizePendingAndNormalizeFunType : M Unit := do
-  synthesizeAppInstMVars
+  trySynthesizeAppInstMVars
   synthesizeSyntheticMVars
   let s ← get
   let fType ← whnfForall s.fType
@@ -348,6 +362,7 @@ private def propagateExpectedType (arg : Arg) : M Unit := do
           | some fTypeBody =>
             unless fTypeBody.hasLooseBVars do
               unless (← hasOptAutoParams fTypeBody) do
+                trySynthesizeAppInstMVars
                 trace[Elab.app.propagateExpectedType] "{expectedType} =?= {fTypeBody}"
                 if (← isDefEq expectedType fTypeBody) then
                   /- Note that we only set `propagateExpected := false` when propagation has succeeded. -/
@@ -389,6 +404,7 @@ private def finalize : M Expr := do
     else
       return e
   if let some expectedType := s.expectedType? then
+    trySynthesizeAppInstMVars
     -- Try to propagate expected type. Ignore if types are not definitionally equal, caller must handle it.
     trace[Elab.app.finalize] "expected type: {expectedType}"
     discard <| isDefEq expectedType eType
@@ -666,6 +682,12 @@ end ElabAppArgs
 builtin_initialize elabAsElim : TagAttribute ←
   registerTagAttribute `elab_as_elim
     "instructs elaborator that the arguments of the function application should be elaborated as were an eliminator"
+    /-
+    We apply `elab_as_elim` after compilation because this kind of attribute is not applied to auxiliary declarations
+    created by the `WF` and `Structural` modules. This is an "indirect" fix for issue #1900. We should consider
+    having an explicit flag in attributes to indicate whether they should be copied to auxiliary declarations or not.
+    -/
+    (applicationTime := .afterCompilation)
     fun declName => do
       let go : MetaM Unit := do
         discard <| getElimInfo declName
@@ -1275,8 +1297,8 @@ where
 
   toLVals : List Syntax → (first : Bool) → List LVal
     | [],            _     => []
-    | field::fields, true  => .fieldName field field.getId.toString (toName (field::fields)) fIdent :: toLVals fields false
-    | field::fields, false => .fieldName field field.getId.toString none fIdent :: toLVals fields false
+    | field::fields, true  => .fieldName field field.getId.getString! (toName (field::fields)) fIdent :: toLVals fields false
+    | field::fields, false => .fieldName field field.getId.getString! none fIdent :: toLVals fields false
 
 /-- Resolve `(.$id:ident)` using the expected type to infer namespace. -/
 private partial def resolveDotName (id : Syntax) (expectedType? : Option Expr) : TermElabM Name := do
@@ -1317,7 +1339,7 @@ private partial def elabAppFn (f : Syntax) (lvals : List LVal) (namedArgs : Arra
     let elabFieldName (e field : Syntax) := do
       let newLVals := field.identComponents.map fun comp =>
         -- We use `none` in `suffix?` since `field` can't be part of a composite name
-        LVal.fieldName comp (toString comp.getId) none e
+        LVal.fieldName comp comp.getId.getString! none e
       elabAppFn e (newLVals ++ lvals) namedArgs args expectedType? explicit ellipsis overloaded acc
     let elabFieldIdx (e idxStx : Syntax) := do
       let some idx := idxStx.isFieldIdx? | throwError "invalid field index"

@@ -6,7 +6,7 @@ Author: Leonardo de Moura
 prelude
 import Init.Data.Array.Basic
 import Init.Data.Array.Subarray
-import Init.Data.UInt
+import Init.Data.UInt.Basic
 import Init.Data.Option.Basic
 universe u
 
@@ -66,6 +66,12 @@ def set : (a : ByteArray) → (@& Fin a.size) → UInt8 → ByteArray
 @[extern "lean_byte_array_uset"]
 def uset : (a : ByteArray) → (i : USize) → UInt8 → i.toNat < a.size → ByteArray
   | ⟨bs⟩, i, v, h => ⟨bs.uset i v h⟩
+
+@[extern "lean_byte_array_hash"]
+protected opaque hash (a : @& ByteArray) : UInt64
+
+instance : Hashable ByteArray where
+  hash := ByteArray.hash
 
 def isEmpty (s : ByteArray) : Bool :=
   s.size == 0

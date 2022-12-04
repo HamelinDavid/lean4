@@ -82,21 +82,38 @@ private def reduceProjFn? (e : Expr) : SimpM (Option Expr) := do
     match (← getProjectionFnInfo? cinfo.name) with
     | none => return none
     | some projInfo =>
-      if projInfo.fromClass then
-        if (← read).isDeclToUnfold cinfo.name then
-          -- We only unfold class projections when the user explicitly requested them to be unfolded.
-          -- Recall that `unfoldDefinition?` has support for unfolding this kind of projection.
-          withReducibleAndInstances <| unfoldDefinition? e
-        else
-          return none
-      else
-        -- `structure` projection
-        match (← unfoldDefinition? e) with
+      /- Helper function for applying `reduceProj?` to the result of `unfoldDefinition?` -/
+      let reduceProjCont? (e? : Option Expr) : SimpM (Option Expr) := do
+        match e? with
         | none   => pure none
         | some e =>
           match (← reduceProj? e.getAppFn) with
           | some f => return some (mkAppN f e.getAppArgs)
           | none   => return none
+      if projInfo.fromClass then
+        -- `class` projection
+        if (← read).isDeclToUnfold cinfo.name then
+          /-
+          If user requested `class` projection to be unfolded, we set transparency mode to `.instances`,
+          and invoke `unfoldDefinition?`.
+          Recall that `unfoldDefinition?` has support for unfolding this kind of projection when transparency mode is `.instances`.
+          -/
+          withReducibleAndInstances <| unfoldDefinition? e
+        else
+          /-
+          Recall that class projections are **not** marked with `[reducible]` because we want them to be
+          in "reducible canonical form". However, if we have a class projection of the form `Class.projFn (Class.mk ...)`,
+          we want to reduce it. See issue #1869 for an example where this is important.
+          -/
+          unless e.getAppNumArgs > projInfo.numParams do
+            return none
+          let major := e.getArg! projInfo.numParams
+          unless major.isConstructorApp (← getEnv) do
+            return none
+          reduceProjCont? (← withDefault <| unfoldDefinition? e)
+      else
+        -- `structure` projections
+        reduceProjCont? (← unfoldDefinition? e)
 
 private def reduceFVar (cfg : Config) (e : Expr) : MetaM Expr := do
   if cfg.zeta then
@@ -260,6 +277,7 @@ partial def simp (e : Expr) : M Result := withIncRecDepth do
       -/
       if result.dischargeDepth ≤ (← readThe Simp.Context).dischargeDepth then
         return result
+  trace[Meta.Tactic.simp.heads] "{repr e.toHeadIndex}"
   simpLoop { expr := e }
 
 where
@@ -373,7 +391,7 @@ where
       -- We always use simple congruence theorems for auxiliary match applications
       return none
     let info ← getFunInfo f
-    let kinds := getCongrSimpKinds info
+    let kinds ← getCongrSimpKinds f info
     if kinds.all fun k => match k with | CongrArgKind.fixed => true | CongrArgKind.eq => true | _ => false then
       /- If all argument kinds are `fixed` or `eq`, then using
          simple congruence theorems `congr`, `congrArg`, and `congrFun` produces a more compact proof -/
@@ -732,7 +750,8 @@ def main (e : Expr) (ctx : Context) (usedSimps : UsedSimps := {}) (methods : Met
   withSimpConfig ctx do
     try
       let (r, s) ← simp e methods ctx |>.run { usedTheorems := usedSimps }
-      pure (r, s.usedTheorems)
+      trace[Meta.Tactic.simp.numSteps] "{s.numSteps}"
+      return (r, s.usedTheorems)
     catch ex =>
       if ex.isMaxHeartbeat then throwNestedTacticEx `simp ex else throw ex
 

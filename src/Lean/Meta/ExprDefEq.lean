@@ -308,7 +308,7 @@ private partial def isDefEqBindingAux (lctx : LocalContext) (fvars : Array Expr)
   isDefEqBindingAux lctx #[] a b #[]
 
 private def checkTypesAndAssign (mvar : Expr) (v : Expr) : MetaM Bool :=
-  withTraceNode `Meta.isDefEq.assign.checkTypes (return m!"{exceptBoolEmoji ·} ({mvar} : {← inferType mvar}) := ({v} : {← inferType v})") do
+  withTraceNodeBefore `Meta.isDefEq.assign.checkTypes (return m!"({mvar} : {← inferType mvar}) := ({v} : {← inferType v})") do
     if !mvar.isMVar then
       trace[Meta.isDefEq.assign.checkTypes] "metavariable expected"
       return false
@@ -795,7 +795,26 @@ mutual
       | Expr.fvar ..         => checkFVar e
       | Expr.mvar ..         => checkMVar e
       | Expr.app ..          =>
-        checkApp e
+        try
+          checkApp e
+        catch ex => match ex with
+          | .internal id =>
+            /-
+            If `ex` is an `CheckAssignmentM` internal exception and `e` is a beta-redex, we reduce `e` and try again.
+            This is useful for assignments such as `?m := (fun _ => A) a` where `a` is free variable that is not in
+            the scope of `?m`.
+            Note that, we do not try expensive reductions (e.g., `delta`). Thus, the following assignment
+            ```lean
+            ?m := Function.const 0 a
+            ```
+            still fails because we do reduce the rhs to `0`. We assume this is not an issue in practice.
+            -/
+            if (id == outOfScopeExceptionId || id == checkAssignmentExceptionId) && e.isHeadBetaTarget then
+              checkApp e.headBeta
+            else
+              throw ex
+          | _ => throw ex
+
         -- TODO: investigate whether the following feature is too expensive or not
         /-
         catchInternalIds [checkAssignmentExceptionId, outOfScopeExceptionId]
@@ -1010,7 +1029,7 @@ private partial def processConstApprox (mvar : Expr) (args : Array Expr) (patter
 /-- Tries to solve `?m a₁ ... aₙ =?= v` by assigning `?m`.
     It assumes `?m` is unassigned. -/
 private partial def processAssignment (mvarApp : Expr) (v : Expr) : MetaM Bool :=
-  withTraceNode `Meta.isDefEq.assign (return m!"{exceptBoolEmoji ·} {mvarApp} := {v}") do
+  withTraceNodeBefore `Meta.isDefEq.assign (return m!"{mvarApp} := {v}") do
     let mvar := mvarApp.getAppFn
     let mvarDecl ← mvar.mvarId!.getDecl
     let rec process (i : Nat) (args : Array Expr) (v : Expr) := do
@@ -1126,7 +1145,7 @@ private def tryHeuristic (t s : Expr) : MetaM Bool := do
   unless info.hints.isRegular || isMatcherCore (← getEnv) tFn.constName! do
     unless t.hasExprMVar || s.hasExprMVar do
       return false
-  withTraceNode `Meta.isDefEq.delta (return m!"{exceptBoolEmoji ·} {t} =?= {s}") do
+  withTraceNodeBefore `Meta.isDefEq.delta (return m!"{t} =?= {s}") do
     /-
       We process arguments before universe levels to reduce a source of brittleness in the TC procedure.
 
@@ -1608,10 +1627,10 @@ end
   | none   => failK
 
 private def isDefEqOnFailure (t s : Expr) : MetaM Bool := do
-  trace[Meta.isDefEq.onFailure] "{t} =?= {s}"
-  unstuckMVar t (fun t => Meta.isExprDefEqAux t s) <|
-  unstuckMVar s (fun s => Meta.isExprDefEqAux t s) <|
-  tryUnificationHints t s <||> tryUnificationHints s t
+  withTraceNodeBefore `Meta.isDefEq.onFailure (return m!"{t} =?= {s}") do
+    unstuckMVar t (fun t => Meta.isExprDefEqAux t s) <|
+    unstuckMVar s (fun s => Meta.isExprDefEqAux t s) <|
+    tryUnificationHints t s <||> tryUnificationHints s t
 
 private def isDefEqProj : Expr → Expr → MetaM Bool
   | Expr.proj _ i t, Expr.proj _ j s => pure (i == j) <&&> Meta.isExprDefEqAux t s
@@ -1714,11 +1733,17 @@ private def getCachedResult (key : Expr × Expr) : MetaM LBool := do
   | none => return .undef
 
 private def cacheResult (key : Expr × Expr) (result : Bool) : MetaM Unit := do
+  /-
+  We must ensure that all assigned metavariables in the key are replaced by their current assingments.
+  Otherwise, the key is invalid after the assignment is "backtracked".
+  See issue #1870 for an example.
+  -/
+  let key := (← instantiateMVars key.1, ← instantiateMVars key.2)
   modifyDefEqCache fun c => c.insert key result
 
 @[export lean_is_expr_def_eq]
 partial def isExprDefEqAuxImpl (t : Expr) (s : Expr) : MetaM Bool := withIncRecDepth do
-  withTraceNode `Meta.isDefEq (return m!"{exceptBoolEmoji ·} {t} =?= {s}") do
+  withTraceNodeBefore `Meta.isDefEq (return m!"{t} =?= {s}") do
   checkMaxHeartbeats "isDefEq"
   whenUndefDo (isDefEqQuick t s) do
   whenUndefDo (isDefEqProofIrrel t s) do
@@ -1756,11 +1781,23 @@ partial def isExprDefEqAuxImpl (t : Expr) (s : Expr) : MetaM Bool := withIncRecD
 
 builtin_initialize
   registerTraceClass `Meta.isDefEq
-  registerTraceClass `Meta.isDefEq.foApprox
-  registerTraceClass `Meta.isDefEq.constApprox
-  registerTraceClass `Meta.isDefEq.delta (inherited := true)
+  registerTraceClass `Meta.isDefEq.stuck
+  registerTraceClass `Meta.isDefEq.stuck.mvar (inherited := true)
+  registerTraceClass `Meta.isDefEq.cache
+  registerTraceClass `Meta.isDefEq.foApprox (inherited := true)
+  registerTraceClass `Meta.isDefEq.onFailure (inherited := true)
+  registerTraceClass `Meta.isDefEq.constApprox (inherited := true)
+  registerTraceClass `Meta.isDefEq.delta
+  registerTraceClass `Meta.isDefEq.delta.unfoldLeft (inherited := true)
+  registerTraceClass `Meta.isDefEq.delta.unfoldRight (inherited := true)
+  registerTraceClass `Meta.isDefEq.delta.unfoldLeftRight (inherited := true)
   registerTraceClass `Meta.isDefEq.assign
   registerTraceClass `Meta.isDefEq.assign.checkTypes (inherited := true)
+  registerTraceClass `Meta.isDefEq.assign.outOfScopeFVar (inherited := true)
+  registerTraceClass `Meta.isDefEq.assign.beforeMkLambda (inherited := true)
+  registerTraceClass `Meta.isDefEq.assign.typeError (inherited := true)
+  registerTraceClass `Meta.isDefEq.assign.occursCheck (inherited := true)
+  registerTraceClass `Meta.isDefEq.assign.readOnlyMVarWithBiggerLCtx (inherited := true)
   registerTraceClass `Meta.isDefEq.eta.struct
 
 end Lean.Meta
